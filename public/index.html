@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NOVA — Intro</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="wrap">
+    <h1 class="title">Welcome to NOVA</h1>
+    <p class="subtitle">Your purpose journey begins here.</p>
+
+    <audio id="nova-intro" preload="metadata" playsinline>
+      <source src="/assets/audio/Sierra_Nova.mp3" type="audio/mpeg" />
+      <source src="/assets/audio/Sierra_Nova.ogg" type="audio/ogg" />
+      <source src="/assets/audio/Sierra_Nova.m4a" type="audio/mp4" />
+      Your browser does not support the audio element.
+    </audio>
+
+    <div id="play-overlay" class="overlay hidden">
+      <button id="play-btn" class="btn">▶ Play Intro</button>
+    </div>
+
+    <div class="controls">
+      <button id="replay-btn" class="btn btn-secondary">↺ Replay</button>
+      <button id="continue-btn" class="btn" onclick="window.location.href='/traits.html'">Continue</button>
+    </div>
+
+    <p id="status" class="status" aria-live="polite"></p>
+  </main>
+
+  <script src="/script.js"></script>
+</body>
+</html>

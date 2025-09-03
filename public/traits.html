@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NOVA — 50 Traits</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="wrap">
+    <h1 class="title">Select Your Traits</h1>
+    <p class="subtitle">Choose as many as apply to you.</p>
+
+    <div id="traits" class="traits-grid"></div>
+
+    <div class="controls">
+      <button id="clear" class="btn btn-secondary">Clear</button>
+      <button id="to-results" class="btn">See Results</button>
+    </div>
+  </main>
+
+  <script>
+    const TRAITS = ["Analytical", "Creative", "Leadership", "Detail-Oriented", "Empathetic", "Strategic", "Hands-on", "Curious", "Organized", "Resilient", "Adaptable", "Collaborative", "Communicative", "Innovative", "Problem-Solver", "Self-Starter", "Patient", "Practical", "Visionary", "Methodical", "Results-Driven", "Data-Driven", "Big-Picture", "Customer-Focused", "Process-Oriented", "Quality-Focused", "Ethical", "Diplomatic", "Persuasive", "Calm-Under-Pressure", "Technical", "Numerate", "Verbal", "Written", "Teaching", "Mentoring", "Design", "Research", "Systems-Thinking", "Safety-Focused", "Time-Management", "Decision-Making", "Negotiation", "Attention-to-Detail", "Service-Oriented", "Entrepreneurial", "Organizational", "Multitasking", "Observant", "Strategic-Planning"];
+    const container = document.getElementById('traits');
+    const chosen = new Set(JSON.parse(localStorage.getItem('nova_traits')||'[]'));
+
+    function render() {
+      container.innerHTML = '';
+      TRAITS.forEach(t => {
+        const b = document.createElement('button');
+        b.textContent = t;
+        b.className = 'chip' + (chosen.has(t)?' chip-on':'');
+        b.onclick = () => {
+          if (chosen.has(t)) { chosen.delete(t); b.classList.remove('chip-on'); }
+          else { chosen.add(t); b.classList.add('chip-on'); }
+          localStorage.setItem('nova_traits', JSON.stringify([...chosen]));
+        };
+        container.appendChild(b);
+      });
+    }
+    render();
+
+    document.getElementById('to-results').onclick = () => location.href='/results.html';
+    document.getElementById('clear').onclick = () => { chosen.clear(); localStorage.removeItem('nova_traits'); render(); };
+  </script>
+</body>
+</html>

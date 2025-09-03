@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NOVA — Results</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="wrap">
+    <h1 class="title">Your NOVA Results</h1>
+    <p class="subtitle">Based on your selected traits, here are matching careers from the Occupational Outlook Handbook.</p>
+
+    <section id="summary"></section>
+    <section id="matches"></section>
+
+    <div class="controls">
+      <button class="btn" onclick="window.location.href='/navi.html'">Proceed to NAVI</button>
+    </div>
+  </main>
+
+  <script>
+    const chosen = new Set(JSON.parse(localStorage.getItem('nova_traits') || '[]'));
+    const TRAIT_KEYWORDS = {
+      "Analytical": ["analy", "quant", "data", "stat"],
+      "Creative": ["design", "creative", "art", "concept"],
+      "Leadership": ["lead", "manage", "supervis"],
+      "Detail-Oriented": ["detail", "accuracy", "inspection"],
+      "Empathetic": ["care", "support", "counsel", "patient"],
+      "Strategic": ["strategy", "plan"],
+      "Hands-on": ["repair", "install", "operate", "hands"],
+      "Curious": ["research", "investigate", "explore"],
+      "Organized": ["organize", "schedule", "coordinate"],
+      "Resilient": ["stress", "pressure", "emergency"],
+      "Adaptable": ["adapt", "change", "flexible"],
+      "Collaborative": ["team", "collabor"],
+      "Communicative": ["communicat", "present", "write"],
+      "Innovative": ["innov", "novel", "improve"],
+      "Problem-Solver": ["problem", "solve", "troubleshoot"],
+      "Self-Starter": ["independent", "self", "initiative"],
+      "Patient": ["patient", "care"],
+      "Practical": ["practical", "applied"],
+      "Visionary": ["vision", "future"],
+      "Methodical": ["method", "process"],
+      "Results-Driven": ["result", "target", "goal"],
+      "Data-Driven": ["data", "metrics"],
+      "Big-Picture": ["strategy", "vision"],
+      "Customer-Focused": ["customer", "client"],
+      "Process-Oriented": ["process", "workflow"],
+      "Quality-Focused": ["quality", "qa"],
+      "Ethical": ["ethic", "compliance"],
+      "Diplomatic": ["diplom", "stakeholder"],
+      "Persuasive": ["persuad", "influence", "sell"],
+      "Calm-Under-Pressure": ["pressure", "emergency", "deadline"],
+      "Technical": ["technical", "engineering", "systems"],
+      "Numerate": ["math", "numeric"],
+      "Verbal": ["speak", "present"],
+      "Written": ["write", "document"],
+      "Teaching": ["teach", "instruct"],
+      "Mentoring": ["mentor", "coach"],
+      "Design": ["design", "ux", "ui"],
+      "Research": ["research", "lab"],
+      "Systems-Thinking": ["system", "architecture"],
+      "Safety-Focused": ["safety", "compliance"],
+      "Time-Management": ["time", "schedule"],
+      "Decision-Making": ["decision", "choose"],
+      "Negotiation": ["negotiat", "contract"],
+      "Attention-to-Detail": ["detail", "accuracy"],
+      "Service-Oriented": ["service", "support"],
+      "Entrepreneurial": ["startup", "business", "venture"],
+      "Organizational": ["organize", "structure"],
+      "Multitasking": ["multi", "parallel"],
+      "Observant": ["observe", "monitor"],
+      "Strategic-Planning": ["strategy", "planning"]
+    };
+
+    const summaryEl = document.getElementById('summary');
+    const matchesEl = document.getElementById('matches');
+    summaryEl.innerHTML = '<h3>Selected Traits</h3><p>' + [...chosen].join(', ') + '</p>';
+
+    fetch('/data/ooh.json', {cache:'reload'})
+      .then(r => r.json())
+      .then(all => {
+        // simple keyword matching against title + summary
+        const scored = all.map(job => {
+          const hay = (job.title + ' ' + (job.summary||'')).toLowerCase();
+          let score = 0;
+          chosen.forEach(t => {
+            (TRAIT_KEYWORDS[t]||[]).forEach(k => { if (hay.includes(k)) score += 1; });
+          });
+          return {...job, score};
+        }).filter(j => j.score > 0).sort((a,b)=>b.score-a.score).slice(0,50);
+
+        if (scored.length === 0) {
+          matchesEl.innerHTML = '<p>No direct keyword matches found. Showing a selection of careers to explore.</p>'
+            + '<ul>' + all.slice(0,50).map(j=>'<li><strong>'+j.title+'</strong>'+(j.median_pay?(' — '+j.median_pay):'')+(j.url?(' — <a href="'+j.url+'" target="_blank">details</a>'):'')+'</li>').join('') + '</ul>';
+          return;
+        }
+        matchesEl.innerHTML = '<h3>Suggested Careers</h3>'
+          + '<ol>' + scored.map(j=>'<li><strong>'+j.title+'</strong>'+(j.median_pay?(' — '+j.median_pay):'')+(j.url?(' — <a href="'+j.url+'" target="_blank">details</a>'):'')+'</li>').join('') + '</ol>';
+      })
+      .catch(err => {
+        matchesEl.innerHTML = '<p>Could not load career data right now.</p>';
+        console.error(err);
+      });
+  </script>
+</body>
+</html>
