@@ -1,0 +1,14 @@
+{
+  "name": "nova-navi",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/fetch_ooh.js"
+  },
+  "dependencies": {
+    "xml2js": "^0.6.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
